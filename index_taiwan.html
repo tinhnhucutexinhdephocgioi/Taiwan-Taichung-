@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Taichung 2026</title>
+<style>
+:root{--bg:#f5f4f2;--card:#fff;--ink:#1b1b1b;--mute:#8a8a8a;--line:#e3e1dd;--navy:#16294d;--food:#f6ece8;--foodink:#8a3a22;--badge:#e8effb;--badgeink:#1f3b73}
+@media(prefers-color-scheme:dark){:root{--bg:#141414;--card:#1f1f1f;--ink:#f1f1f1;--mute:#9a9a9a;--line:#333;--navy:#8fb0ff;--food:#2b1f1b;--foodink:#e8a58f;--badge:#22304f;--badgeink:#bcd0ff}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Segoe UI","Noto Sans TC","Noto Sans",sans-serif;line-height:1.45}
+header{background:var(--card);padding:28px 20px 18px;border-bottom:1px solid var(--line)}
+.wrap{max-width:720px;margin:0 auto}
+h1{margin:0;font-size:28px}
+.sub{color:var(--mute);margin:6px 0 16px}
+.langs{display:flex;gap:8px;flex-wrap:wrap}
+.langs button{font:inherit;padding:8px 18px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--mute);cursor:pointer}
+.langs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+@media(prefers-color-scheme:dark){.langs button.on{color:#111}}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.stat small{color:var(--mute);font-size:12px;letter-spacing:.06em}
+.stat b{display:block;font-size:22px}
+.city{display:flex;align-items:center;gap:12px;margin:26px 0 12px;font-weight:700;letter-spacing:.1em;font-size:14px}
+.city::before,.city::after{content:"";flex:1;height:1px;background:var(--line)}
+details{background:var(--card);border:1px solid var(--line);border-radius:18px;margin-bottom:12px;overflow:hidden}
+details.food{background:var(--food);border-color:transparent}
+summary{list-style:none;display:flex;align-items:center;gap:14px;padding:16px;cursor:pointer}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"\2304";margin-left:auto;color:var(--mute);font-size:20px;transition:transform .2s}
+details[open] summary::after{transform:rotate(180deg)}
+.badge{flex:none;width:52px;height:52px;border-radius:50%;background:var(--badge);color:var(--badgeink);display:grid;place-items:center;font-weight:700;font-size:13px}
+.food summary{color:var(--foodink)}
+.ico{font-size:30px}
+li.tip{display:block;line-height:1.5}
+.t small{color:var(--mute);display:block}
+.food .t small{color:var(--foodink);opacity:.8}
+.t strong{font-size:18px}
+ul{list-style:none;margin:0;padding:0 16px 14px}
+li{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--line);align-items:baseline}
+li time{flex:none;width:48px;color:var(--mute);font-size:14px}
+li a{margin-left:auto;text-decoration:none;font-size:18px}
+.how{margin:0 16px 8px;padding:10px 12px;border-radius:10px;background:var(--badge);color:var(--badgeink);font-size:14px}
+li a+a{margin-left:6px}
+.tally{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-bottom:12px}
+.tally b{font-size:18px}
+li.gift label{display:flex;gap:10px;align-items:center;width:100%;cursor:pointer}
+li.gift input{width:18px;height:18px;flex:none}
+li.gift small{display:block;color:var(--mute);font-size:12px}
+li.gift em{margin-left:auto;font-style:normal;color:var(--mute);white-space:nowrap;font-size:14px}
+.note{padding:0 16px 14px;color:var(--mute);font-size:14px}
+footer{color:var(--mute);font-size:13px;text-align:center;padding:20px}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<h1 id="title"></h1><p class="sub" id="sub"></p>
+<div class="langs" id="langs"></div>
+</div></header>
+<main class="wrap">
+<div class="stats" id="stats"></div>
+<div id="list"></div>
+</main>
+<footer id="foot"></footer>
+<script>
+// ===== Dữ liệu: sửa nội dung ở đây =====
+var LANGS=[["en","English"],["zh","繁體中文"],["vi","Tiếng Việt"]];
+var UI={
+ title:{en:"Taichung ✈ 4 Days",zh:"台中 ✈ 四天遊",vi:"Đài Trung ✈ 4 ngày"},
+ sub:{en:"4 days · 3 nights · public transport only",zh:"4天3夜・全程大眾運輸",vi:"4 ngày 3 đêm · chỉ đi phương tiện công cộng"},
+ cities:{en:"Cities",zh:"城市",vi:"Thành phố"},nights:{en:"Nights",zh:"夜數",vi:"Đêm"},spots:{en:"Spots",zh:"景點",vi:"Điểm đến"},
+ food:{en:"Local Food Picks",zh:"在地美食",vi:"Món nên thử"},foodSub:{en:"Must-try",zh:"必吃推薦",vi:"Gợi ý ăn uống"},
+ souv:{en:"Must-buy Souvenirs",zh:"必買伴手禮",vi:"Quà lưu niệm nên mua"},souvSub:{en:"Take these home",zh:"帶回家的好物",vi:"Mua về làm quà"},
+ tipsTitle:{en:"FIRST-TIMER TIPS",zh:"初次來台小撇步",vi:"MẸO CHO NGƯỜI MỚI ĐẾN"},
+ shopTitle:{en:"CHEAP & FUN GIFTS",zh:"平價特色伴手禮",vi:"QUÀ RẺ & ĐỘC ĐÁO"},
+ tally:{en:"Your picks (tick items below), est. total",zh:"你的選擇(勾選下方品項),預估合計",vi:"Món bạn chọn (tick bên dưới), ước tính tổng"},
+ day:{en:"Day ",zh:"第",vi:"Ngày "},dayEnd:{en:"",zh:"天",vi:""},
+ foot:{en:"Check bus and train times on Google Maps or the Taiwan Bus app before you go.",zh:"出發前請用 Google Maps 或 Taiwan Bus App 確認班次。",vi:"Trước khi đi, kiểm tra giờ xe trên Google Maps hoặc app Taiwan Bus."}
+};
+var CITY={
+ tc:{n:{en:"TAICHUNG",zh:"台中",vi:"ĐÀI TRUNG"},c:"#4a6fd1"},
+ lk:{n:{en:"LUKANG",zh:"鹿港",vi:"LỘC CẢNG"},c:"#c0762b"},
+ sm:{n:{en:"SUN MOON LAKE",zh:"日月潭",vi:"NHẬT NGUYỆT ĐÀM"},c:"#3d9a77"}
+};
+var FOOD={
+ tc:[["Fengjia Night Market","逢甲夜市","Chợ đêm Phùng Giáp"],["Chun Shui Tang (bubble tea)","春水堂(珍珠奶茶)","Chun Shui Tang (trà sữa trân châu)"],["Miyahara ice cream","宮原眼科冰淇淋","Kem Miyahara"],["Sun cake","太陽餅","Bánh mặt trời"]],
+ lk:[["Oyster omelette","蚵仔煎","Bánh hào chiên"],["Shrimp monkey","蝦猴","Tép biển chiên"],["Misua soup","麵線糊","Mì sợi sệt"],["Ox-tongue cookies","牛舌餅","Bánh lưỡi bò"]],
+ sm:[["Assam black tea","阿薩姆紅茶","Hồng trà Assam"],["Tea-leaf egg","茶葉蛋","Trứng trà"],["Thao tribe dishes","邵族風味餐","Món người Thiệu"]]
+};
+// stop: [giờ, en, zh, vi, từ khoá Google Maps]
+var DAYS=[
+ {city:"tc",t:{en:"Campus & old downtown",zh:"校園與舊城區",vi:"Khuôn viên & trung tâm cổ"},how:{en:"Taichung city buses: tap EasyCard/iPASS. Tap 🚌 on any stop for live bus numbers from the previous stop.",zh:"台中市區公車可刷悠遊卡/一卡通。點各景點的 🚌 可查從上一站出發的即時公車。",vi:"Bus nội thành Đài Trung quẹt EasyCard/iPASS. Bấm 🚌 ở từng điểm để xem số xe từ điểm trước đó."},stops:[
+  ["09:00","NCHU campus","中興大學","Đại học Trung Hưng","National Chung Hsing University"],
+  ["12:00","Lunch near campus","校園周邊午餐","Ăn trưa gần trường","National Chung Hsing University restaurants"],
+  ["14:00","Taichung Park","台中公園","Công viên Đài Trung","Taichung Park"],
+  ["15:15","Taichung Second Market","第二市場","Chợ Số 2 (Dì Nhị Thị Trường)","Taichung Second Market"],
+  ["16:00","Miyahara","宮原眼科","Miyahara","Miyahara Taichung"],
+  ["17:30","Green Ray Skywalk","綠空鐵道","Đường đi bộ Green Ray","Green Ray Skywalk Taichung"],
+  ["19:00","Fengjia Night Market","逢甲夜市","Chợ đêm Phùng Giáp","Fengjia Night Market"]]},
+ {city:"lk",t:{en:"Lukang day trip",zh:"鹿港一日遊",vi:"Một ngày ở Lộc Cảng"},note:{en:"Train to Changhua, then bus to Lukang (about 40 min). Leave Lukang before the evening bus gets sparse.",zh:"搭火車到彰化再轉公車到鹿港(約40分鐘)。傍晚班次較少,請提早返程。",vi:"Đi tàu đến Chương Hóa rồi đổi bus đến Lộc Cảng (khoảng 40 phút). Nên về trước khi xe buổi tối thưa."},how:{en:"Option A: direct bus 9018 from Taichung Station (about 1.5 h, roughly every 30 min). Option B: TRA train to Changhua (about 22 min), then Changhua Bus 6933 / 6933A / 6900 / 6934 to Lukang (about 45 min). Return the same way.",zh:"方案A:台中火車站搭中鹿客運9018直達鹿港(約1.5小時,約每30分鐘一班)。方案B:搭台鐵到彰化(約22分鐘),再轉彰化客運6933/6933A/6900/6934到鹿港(約45分鐘)。原路返回。",vi:"Cách A: bus 9018 chạy thẳng từ ga Đài Trung đến Lộc Cảng (khoảng 1,5 tiếng, tầm 30 phút/chuyến). Cách B: tàu TRA đến Chương Hóa (khoảng 22 phút), rồi đổi bus Changhua 6933 / 6933A / 6900 / 6934 đến Lộc Cảng (khoảng 45 phút). Về lại theo đường cũ."},stops:[
+  ["08:30","Train to Changhua + bus","火車到彰化轉公車","Tàu đến Chương Hóa + bus","Changhua Station"],
+  ["10:00","Lukang Mazu Temple","鹿港天后宮","Chùa Thiên Hậu","Lukang Mazu Temple"],
+  ["11:00","Old Street & Nine Turns Lane","老街・九曲巷","Phố cổ & Ngõ Cửu Khúc","Lukang Old Street"],
+  ["11:40","Half-Side Well","半邊井","Giếng nửa bên","Lukang Half-Side Well"],
+  ["12:30","Local snacks lunch","鹿港小吃午餐","Ăn trưa đồ ăn vặt","Lukang Old Street food"],
+  ["14:30","Longshan Temple","鹿港龍山寺","Chùa Long Sơn","Lukang Longshan Temple"],
+  ["15:15","Lukang Folk Arts Museum","鹿港民俗文物館","Bảo tàng văn vật dân gian Lộc Cảng","Lukang Folk Arts Museum"],
+  ["15:50","Glass Museum (optional)","台灣玻璃館(可略)","Bảo tàng thủy tinh (tuỳ chọn)","Taiwan Glass Museum"],
+  ["17:00","Back to Taichung","返回台中","Về Đài Trung","Taichung Station"]]},
+ {city:"tc",t:{en:"Rainbow Village, museums & opera house",zh:"彩虹眷村、博物館與歌劇院",vi:"Làng Cầu Vồng, bảo tàng & nhà hát"},how:{en:"Use 🚌 on each stop for the exact bus from the previous stop. Rainbow Village is on the outskirts, so go first and check the return bus.",zh:"每個景點可點 🚌 查上一站的公車。彩虹眷村位置較偏,建議先去並確認回程班次。",vi:"Bấm 🚌 ở từng điểm để xem bus từ điểm trước. Làng Cầu Vồng hơi xa trung tâm nên đi đầu tiên và kiểm tra xe về."},stops:[
+  ["09:00","Rainbow Village","彩虹眷村","Làng Cầu Vồng","Rainbow Family Village Taichung"],
+  ["11:00","National Museum of Natural Science","國立自然科學博物館","Bảo tàng Khoa học Tự nhiên","National Museum of Natural Science Taichung"],
+  ["14:00","Botanical Garden","科博館植物園","Vườn bách thảo","NMNS Botanical Garden"],
+  ["15:00","National Taiwan Museum of Fine Arts","國立臺灣美術館","Bảo tàng Mỹ thuật Quốc gia Đài Loan","National Taiwan Museum of Fine Arts"],
+  ["16:30","Calligraphy Greenway","草悟道","Calligraphy Greenway","Calligraphy Greenway Taichung"],
+  ["18:00","National Taichung Theater","臺中國家歌劇院","Nhà hát Quốc gia Đài Trung","National Taichung Theater"],
+  ["19:00","Dinner near the theater","歌劇院附近晚餐","Ăn tối gần nhà hát","National Taichung Theater restaurants"]]},
+ {city:"sm",t:{en:"Sun Moon Lake",zh:"日月潭",vi:"Hồ Nhật Nguyệt"},note:{en:"Intercity bus takes about 2 hours each way. Too tiring? Swap for Fengyuan hot springs.",zh:"客運單程約2小時。若太累,可改去豐原溫泉。",vi:"Xe liên tỉnh mất khoảng 2 tiếng mỗi chiều. Nếu mẹ mệt, đổi sang suối nước nóng Phong Nguyên."},how:{en:"Nantou Bus 6670 runs from Taichung Gancheng Station to Sun Moon Lake (about 2 h). Check the last return bus before you leave. Around the lake, use the boat or local shuttle.",zh:"南投客運6670從台中干城站直達日月潭(約2小時)。出發前請確認末班回程車。湖區內可搭船或接駁車。",vi:"Xe Nantou Bus 6670 chạy từ bến Gancheng (Đài Trung) đến Nhật Nguyệt Đàm (khoảng 2 tiếng). Nhớ kiểm tra chuyến xe về cuối cùng. Trong khu hồ đi bằng thuyền hoặc xe buýt nội khu."},stops:[
+  ["08:00","Bus to Sun Moon Lake","客運往日月潭","Xe bus đến Nhật Nguyệt Đàm","Sun Moon Lake Visitor Center"],
+  ["10:30","Lake cruise & walk","遊湖與散步","Đi thuyền & dạo hồ","Sun Moon Lake Shuishe Pier"],
+  ["13:00","Wenwu Temple / Ita Thao","文武廟・伊達邵","Chùa Văn Võ / Ita Thao","Ita Thao Sun Moon Lake"],
+  ["14:30","Xuanzang Temple","玄奘寺","Chùa Huyền Trang","Xuanzang Temple Sun Moon Lake"],
+  ["15:30","Ci'en Pagoda","慈恩塔","Tháp Từ Ân","Ci'en Pagoda Sun Moon Lake"],
+  ["17:00","Back to Taichung","返回台中","Về Đài Trung","Taichung Station"]]}
+];
+
+var SOUV={
+ tc:[["Sun cake (Taiyang cake)","太陽餅","Bánh mặt trời (Thái Dương bính), đặc sản gốc Đài Trung"],["Pineapple cake","鳳梨酥","Bánh dứa"],["Instant pearl milk tea packs","珍珠奶茶沖泡包","Gói trà sữa trân châu pha sẵn"]],
+ lk:[["Ox-tongue cookies","牛舌餅","Bánh lưỡi bò"],["Phoenix-eye cake","鳳眼糕","Bánh mắt phượng (Phụng nhãn cao)"],["Glass crafts","玻璃工藝品","Đồ thủy tinh thủ công"]],
+ sm:[["Assam black tea","阿薩姆紅茶","Hồng trà Assam"],["Thao tribe handicrafts","邵族手工藝品","Đồ thủ công của người Thiệu"],["Black-tea cookies and candy","紅茶餅乾與糖果","Bánh quy và kẹo vị hồng trà"]]
+};
+var TIPS=[
+ {i:"🚫",t:{en:"Rules to know",zh:"法規須知",vi:"Luật & quy định"},items:[
+  ["No eating or drinking in MRT stations or on trains. Fines can reach NT$7,500.","捷運站內與車廂內禁止飲食,最高可罰新台幣7,500元。","Cấm ăn uống trong ga và trên tàu điện MRT, phạt tối đa 7.500 TWD."],
+  ["Vapes and e-cigarettes are banned from sale and import, so do not bring them. Smoking is banned in most indoor spaces.","電子煙禁止販售與輸入,請勿攜帶。多數室內場所禁菸。","Thuốc lá điện tử bị cấm bán và nhập khẩu, đừng mang theo. Hầu hết nơi trong nhà cấm hút thuốc."],
+  ["Cross at crossings only. Scooters often turn while you walk, so look both ways.","請走斑馬線,機車常在行人通行時轉彎,過馬路要看兩邊。","Chỉ qua đường ở vạch dành cho người đi bộ. Xe máy hay rẽ khi bạn đang đi, nhớ nhìn cả hai bên."],
+  ["Few public bins. Keep trash in your bag and throw it away at a convenience store or your hotel.","街上垃圾桶很少,請把垃圾帶到便利商店或住宿處丟。","Thùng rác công cộng rất ít. Giữ rác trong túi, bỏ ở cửa hàng tiện lợi hoặc nơi ở."],
+  ["Emergency: 110 police, 119 fire and ambulance. Tourist hotline 0800-011-765.","緊急電話:110警察、119消防救護。觀光客服務專線 0800-011-765。","Khẩn cấp: 110 công an, 119 cứu hỏa và cấp cứu. Đường dây nóng du lịch 0800-011-765."]]},
+ {i:"🙏",t:{en:"Manners & customs",zh:"禮儀與習俗",vi:"Phép lịch sự & phong tục"},items:[
+  ["Stand on the right of escalators and queue in line. Keep priority seats for those who need them.","手扶梯靠右站立,排隊依序上車。博愛座請讓給有需要的人。","Đứng bên phải thang cuốn và xếp hàng. Nhường ghế ưu tiên cho người cần."],
+  ["Never stick chopsticks upright in rice (it looks like incense for the dead), and don't pass food from chopsticks to chopsticks.","筷子不要直插在飯上(像祭拜用的香),也不要用筷子互相傳遞食物。","Không cắm đũa thẳng đứng vào bát cơm (giống nén hương cúng người mất), và không gắp thức ăn chuyền đũa qua đũa."],
+  ["Avoid giving clocks (sounds like attending a funeral), umbrellas (sounds like parting) or pears (sounds like leaving).","避免送鐘(諧音送終)、傘(諧音散)、梨(諧音離)。","Tránh tặng đồng hồ (âm giống đi viếng), ô (âm giống chia tay), lê (âm giống ly biệt)."],
+  ["Number 8 is lucky (sounds like getting rich) and 4 is unlucky (sounds like death). Some buildings skip floor 4.","8 吉利(諧音發),4 不吉利(諧音死),有些大樓沒有4樓。","Số 8 may mắn (âm giống phát tài), số 4 xui (âm giống chết). Một số tòa nhà không có tầng 4."],
+  ["Tipping is not expected. Many restaurants add a 10% service charge instead.","台灣不需給小費,許多餐廳會另收一成服務費。","Không cần boa. Nhiều nhà hàng đã tự cộng phí phục vụ 10%."]]},
+ {i:"🏮",t:{en:"Temples & what things mean",zh:"廟宇與習俗涵義",vi:"Đền chùa & ý nghĩa phong tục"},items:[
+  ["Mazu is the sea goddess who protects travelers and fishermen. Lukang's Tianhou Temple is dedicated to her.","媽祖是保佑航海與旅人的海神,鹿港天后宮就是供奉媽祖的廟。","Mazu là nữ thần biển bảo hộ người đi biển và du khách. Chùa Thiên Hậu ở Lộc Cảng thờ bà."],
+  ["Dress modestly, don't step on the door threshold, don't touch offerings, and keep your voice down. Hold incense with both hands.","穿著端莊,不要踩門檻、碰供品,保持安靜。上香時雙手持香。","Ăn mặc kín đáo, không dẫm lên ngưỡng cửa, không chạm đồ cúng, nói khẽ. Cầm hương bằng hai tay."],
+  ["Moon blocks (擲筊): two red crescent blocks answer yes or no. Ask one clear question; it's a part of the temple tradition, not a toy.","擲筊用兩個紅色月牙形筊杯問是非,一次問一個明確問題,不是玩具。","Cầu quẻ (擲筊): hai miếng gỗ đỏ hình trăng khuyết cho câu trả lời có hoặc không. Hỏi một câu rõ ràng, đây là nghi thức chứ không phải đồ chơi."],
+  ["Rainbow Village was painted by a former soldier, 'Rainbow Grandpa', to save the village from demolition.","彩虹眷村是退伍老兵「彩虹爺爺」為了保住村子免於拆除而彩繪的。","Làng Cầu Vồng do một cựu binh, 'ông cụ Cầu Vồng', vẽ để cứu ngôi làng khỏi bị phá bỏ."],
+  ["Red means luck and protection, so you will see red lanterns and paper decorations at temples.","紅色代表吉祥與平安,所以廟宇常見紅燈籠與紅色裝飾。","Màu đỏ tượng trưng cho may mắn và bình an, nên đền chùa thường có đèn lồng và đồ trang trí màu đỏ."]]},
+ {i:"🍜",t:{en:"First-timer food list",zh:"首次來台必吃清單",vi:"Món nên thử lần đầu"},items:[
+  ["Bubble tea: Taichung is where it is said to have started. Order sweetness as 全糖 full, 半糖 half, 微糖 light or 無糖 none.","珍珠奶茶:相傳發源於台中。甜度可選全糖、半糖、微糖、無糖。","Trà sữa trân châu: tương truyền bắt nguồn từ Đài Trung. Chọn độ ngọt: 全糖 đủ ngọt, 半糖 nửa đường, 微糖 ít đường, 無糖 không đường."],
+  ["Braised pork rice (滷肉飯) and beef noodle soup (牛肉麵) are everyday classics.","滷肉飯與牛肉麵是台灣日常經典。","Cơm thịt kho (滷肉飯) và mì bò (牛肉麵) là món quen thuộc hằng ngày."],
+  ["Stinky tofu (臭豆腐): strong smell, mild taste. Try it once at a night market.","臭豆腐:味道重但口感溫和,夜市值得嘗一次。","Đậu hũ thối (臭豆腐): mùi nồng nhưng vị nhẹ. Thử một lần ở chợ đêm."],
+  ["Big fried chicken cutlet (雞排) is a Fengjia Night Market classic.","大雞排是逢甲夜市的經典小吃。","Gà chiên cỡ lớn (雞排) là món kinh điển ở chợ đêm Phùng Giáp."],
+  ["Convenience stores sell hot tea eggs, cheap drinks and snacks. Handy for lunch on the road.","便利商店有熱茶葉蛋、平價飲料與點心,趕路時很方便。","Cửa hàng tiện lợi bán trứng trà nóng, đồ uống và đồ ăn nhẹ giá rẻ, rất tiện khi đi đường."]]},
+ {i:"💳",t:{en:"Money, phone & power",zh:"金錢、網路與電源",vi:"Tiền, mạng & ổ điện"},items:[
+  ["Bring cash (NT$) for night markets and small shops. Many 7-Eleven and FamilyMart ATMs take foreign cards.","夜市與小店多用現金。許多 7-Eleven、全家的 ATM 可用國外卡。","Mang tiền mặt (TWD) cho chợ đêm và quán nhỏ. Nhiều máy ATM ở 7-Eleven và FamilyMart nhận thẻ nước ngoài."],
+  ["Plugs are the two flat-pin type at 110V. Phone chargers are fine, but check hair dryers and other 220V devices.","插座為兩孔扁插頭、110V。手機充電器通常沒問題,吹風機等 220V 電器要先確認。","Ổ cắm hai chân dẹt, điện 110V. Sạc điện thoại dùng được, còn máy sấy tóc hoặc đồ 220V phải kiểm tra trước."],
+  ["Get a SIM or eSIM at the airport. Free WiFi is available through iTaiwan in many public places.","可在機場購買SIM卡或eSIM,許多公共場所也有 iTaiwan 免費WiFi。","Mua SIM hoặc eSIM ở sân bay. Nhiều nơi công cộng có WiFi miễn phí iTaiwan."],
+  ["Tourists may claim a tax refund when spending NT$2,000 or more at one participating shop on the same day. Ask the shop and keep your passport.","同一天在同一家退稅店消費滿新台幣2,000元可辦理退稅,請詢問店家並攜帶護照。","Du khách có thể hoàn thuế khi mua từ 2.000 TWD trở lên trong một ngày tại một cửa hàng có tham gia. Hỏi cửa hàng và mang hộ chiếu."]]}
+];
+
+var BUDGET={i:"💰",t:{en:"Budget guide & where to buy",zh:"預算與購買地點",vi:"Ngân sách & nơi mua"},items:[
+ ["Gifts for many people: NT$50–100 each (snacks, noodles, tea packs).","送很多人:每份約新台幣50–100元(零食、泡麵、茶包)。","Quà cho nhiều người: khoảng 50–100 TWD mỗi phần (snack, mì, gói trà)."],
+ ["Family and close friends: NT$150–300 (pineapple cake, nougat, tea).","家人與好友:約150–300元(鳳梨酥、牛軋糖、茶)。","Gia đình, bạn thân: khoảng 150–300 TWD (bánh dứa, kẹo nougat, trà)."],
+ ["Special gifts: NT$300–500 (a nice boxed pineapple cake, good tea, crafts).","特別的禮物:約300–500元(精緻鳳梨酥禮盒、好茶、手工藝品)。","Quà đặc biệt: khoảng 300–500 TWD (hộp bánh dứa đẹp, trà ngon, đồ thủ công)."],
+ ["PX Mart (全聯福利中心) and Carrefour are usually cheaper than shops near tourist spots. Search them on Google Maps near your hotel.","全聯福利中心與家樂福通常比景點附近的商店便宜,可在 Google Maps 搜尋住宿附近的分店。","PX Mart (全聯福利中心) và Carrefour thường rẻ hơn cửa hàng gần điểm du lịch. Tìm trên Google Maps gần chỗ ở."],
+ ["Prices are rough estimates and change by store. Check the date and ingredients on the pack.","價格為大約估計,各店不同,請檢查包裝上的日期與成分。","Giá chỉ là ước chừng, mỗi cửa hàng một khác. Xem hạn dùng và thành phần trên bao bì."],
+ ["Do not buy meat floss, dried meat or fresh fruit to take home. They are often restricted at customs. Check the rules for your country before you buy.","不建議買肉鬆、肉乾或新鮮水果帶回國,常受海關限制,購買前請先確認規定。","Không nên mua chà bông, thịt khô hay trái cây tươi mang về, thường bị hải quan hạn chế. Kiểm tra quy định trước khi mua."]]};
+var GIFTS=[
+ {i:"🍬",t:{en:"Snacks & sweets (PX Mart)",zh:"零食點心(全聯)",vi:"Bánh kẹo, snack (PX Mart)"},items:[
+  {n:["Kuai Kuai coconut snack","乖乖(椰子口味)","Snack 乖乖 (vị dừa)"],p:[20,25],m:["People place it next to machines to keep them 'well-behaved'.","常放在機器旁,祈求機器「乖乖」運作。","Người Đài hay đặt cạnh máy móc để máy 'ngoan ngoãn' chạy ổn định."]},
+  {n:["Imei mini cream puffs","義美小泡芙","Bánh su kem mini Imei"],p:[40,60]},
+  {n:["Want Want rice crackers","旺旺仙貝","Bánh gạo Want Want"],p:[40,70]},
+  {n:["Saqima (sweet egg cake)","沙琪瑪","Bánh sa kỳ ma"],p:[40,70]},
+  {n:["77 chocolate pie","77新貴派","Bánh chocolate pie 77"],p:[60,100]},
+  {n:["Dried mango","芒果乾","Xoài sấy"],p:[80,150]}]},
+ {i:"🍜",t:{en:"Instant noodles & noodle snacks",zh:"泡麵與麵類零食",vi:"Mì gói & snack mì"},items:[
+  {n:["Science Noodles (crunchy snack)","科學麵","Mì Khoa Học (ăn bóp giòn)"],p:[20,30]},
+  {n:["Little Prince noodle snack","小王子麵","Mì Hoàng Tử Bé (snack)"],p:[15,25]},
+  {n:["Zhang Junya noodle snack balls","張君雅小妹妹","Snack mì Trương Quân Nhã"],p:[25,40],m:["Named after a mascot girl on the pack.","名字來自包裝上的小女孩角色。","Tên lấy theo cô bé nhân vật trên bao bì."]},
+  {n:["Uni-President minced pork noodles","統一肉燥麵","Mì thịt băm Uni-President"],p:[25,40]},
+  {n:["Veli zhajiang noodles","維力炸醬麵","Mì tương đen Veli"],p:[20,30]},
+  {n:["A-She dry noodles","阿舍乾麵","Mì trộn khô A-She"],p:[25,40]},
+  {n:["Man Han Feast premium noodles","滿漢大餐","Mì cao cấp Man Han Feast"],p:[50,90]}]},
+ {i:"🧋",t:{en:"Tea packs & drinks",zh:"茶包與飲料",vi:"Trà gói & đồ uống"},items:[
+  {n:["3:15PM instant milk tea box","三點一刻奶茶","Hộp trà sữa pha sẵn 3:15PM"],p:[100,180]},
+  {n:["Black sugar ginger tea cubes","黑糖薑母茶","Đường đen gừng pha trà"],p:[100,150]},
+  {n:["Sun Moon Lake Assam tea bags","日月潭紅茶包","Trà túi lọc Nhật Nguyệt Đàm"],p:[80,150]},
+  {n:["Hey-Song Sarsaparilla (try it)","黑松沙士","Nước Sarsaparilla Hey-Song (thử tại chỗ)"],p:[20,25]},
+  {n:["Mai Hsiang black tea (try it)","麥香紅茶","Hồng trà Mai Hsiang (thử tại chỗ)"],p:[20,30]},
+  {n:["Apple Sidra (try it)","蘋果西打","Nước táo Apple Sidra (thử tại chỗ)"],p:[20,30]}]},
+ {i:"🎁",t:{en:"Gifts with a story",zh:"有故事的伴手禮",vi:"Quà có ý nghĩa"},items:[
+  {n:["Pineapple cake","鳳梨酥","Bánh dứa"],p:[150,300],m:["'Pineapple' sounds like 'fortune comes' in Taiwanese.","「鳳梨」台語近「旺來」,象徵財運到來。","'Dứa' (鳳梨) âm tiếng Đài gần với 'vượng lai', nghĩa là tài lộc đến."]},
+  {n:["Taiwanese nougat","牛軋糖","Kẹo nougat Đài Loan"],p:[150,250]},
+  {n:["Temple peace charm (ask at the temple)","平安符(請在廟裡詢問)","Bùa bình an (hỏi ở chùa)"],p:[50,100],m:["Wishes the carrier a safe journey.","祈求攜帶者旅途平安。","Cầu mong người mang đi đường bình an."]},
+  {n:["Hakka floral cloth bag or pouch","客家花布包","Túi vải hoa Khách Gia"],p:[100,300]},
+  {n:["Small glass craft (Lukang)","玻璃小物(鹿港)","Đồ thủy tinh nhỏ (Lộc Cảng)"],p:[50,300]},
+  {n:["Rainbow Village postcards or magnets","彩虹眷村明信片或磁鐵","Bưu thiếp, nam châm Làng Cầu Vồng"],p:[30,100]},
+  {n:["Mini high-mountain oolong tea pack","高山烏龍茶小包","Gói trà ô long núi cao mini"],p:[100,300]}]}
+];
+// ===== Hết dữ liệu =====
+var HOME="National Chung Hsing University";
+var CHK={};
+var lang="vi";
+try{lang=localStorage.getItem("lang")||(navigator.language.indexOf("zh")==0?"zh":navigator.language.indexOf("en")==0?"en":"vi")}catch(e){}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function pick(a){return a[lang=="en"?0:lang=="zh"?1:2]}
+function updateTally(){var lo=0,hi=0;document.querySelectorAll("#list input[data-k]").forEach(function(c){if(c.checked){lo+=+c.getAttribute("data-lo");hi+=+c.getAttribute("data-hi")}});var t=document.getElementById("tally");if(t)t.textContent="NT$"+lo+(hi>lo?"–"+hi:"")}
+function render(){
+ var open={};document.querySelectorAll("details[open]").forEach(function(d){open[d.id]=1});
+ document.documentElement.lang=lang=="zh"?"zh-Hant":lang;
+ document.getElementById("title").textContent=UI.title[lang];
+ document.getElementById("sub").textContent=UI.sub[lang];
+ document.getElementById("foot").textContent=UI.foot[lang];
+ document.getElementById("langs").innerHTML=LANGS.map(function(l){return '<button data-l="'+l[0]+'" class="'+(l[0]==lang?"on":"")+'">'+l[1]+"</button>"}).join("");
+ var spots=0,cities={};DAYS.forEach(function(d){spots+=d.stops.length;cities[d.city]=1});
+ document.getElementById("stats").innerHTML=[[UI.cities,Object.keys(cities).length],[UI.nights,DAYS.length-1],[UI.spots,spots]].map(function(s){return '<div class="stat"><small>'+s[0][lang].toUpperCase()+"</small><b>"+s[1]+"</b></div>"}).join("");
+ var h="",last="",seen={};
+ DAYS.forEach(function(d,i){
+  if(d.city!=last){
+   h+='<div class="city" style="color:'+CITY[d.city].c+'">'+esc(CITY[d.city].n[lang])+"</div>";
+   if(!seen[d.city]){seen[d.city]=1;var id="f-"+d.city;
+    h+='<details class="food" id="'+id+'"'+(open[id]?" open":"")+'><summary><span class="ico">🍜</span><span class="t"><strong>'+UI.food[lang]+"</strong><small>"+UI.foodSub[lang]+"</small></span></summary><ul>"+FOOD[d.city].map(function(f){return "<li>"+esc(pick(f))+"</li>"}).join("")+"</ul></details>";
+    var sid="s-"+d.city;h+='<details class="food" id="'+sid+'"'+(open[sid]?" open":"")+'><summary><span class="ico">🎁</span><span class="t"><strong>'+UI.souv[lang]+"</strong><small>"+UI.souvSub[lang]+"</small></span></summary><ul>"+SOUV[d.city].map(function(f){return "<li>"+esc(pick(f))+"</li>"}).join("")+"</ul></details>";}
+   last=d.city;}
+  var id="d-"+i;
+  h+='<details id="'+id+'"'+(open[id]?" open":"")+'><summary><span class="badge">'+UI.day[lang]+(i+1)+UI.dayEnd[lang]+'</span><span class="t"><strong>'+esc(d.t[lang])+"</strong><small>"+esc(CITY[d.city].n[lang])+"</small></span></summary>"+(d.how?'<div class="how">🚌 '+esc(d.how[lang])+"</div>":"")+"<ul>"+
+   d.stops.map(function(s,j){var from=j?d.stops[j-1][4]:HOME;return "<li><time>"+s[0]+"</time><span>"+esc(pick([s[1],s[2],s[3]]))+'</span><a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&travelmode=transit&origin='+encodeURIComponent(from)+'&destination='+encodeURIComponent(s[4])+'" aria-label="Transit">🚌</a><a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(s[4])+'" aria-label="Map">📍</a></li>'}).join("")+
+   "</ul>"+(d.note?'<div class="note">'+esc(d.note[lang])+"</div>":"")+"</details>";
+ });
+ h+='<div class="city" style="color:#c0762b">'+UI.shopTitle[lang]+'</div><div class="tally"><span>'+UI.tally[lang]+'</span><b id="tally">NT$0</b></div>';
+ h+='<details id="g-b"'+(open["g-b"]?" open":"")+'><summary><span class="ico">'+BUDGET.i+'</span><span class="t"><strong>'+esc(BUDGET.t[lang])+"</strong></span></summary><ul>"+BUDGET.items.map(function(f){return '<li class="tip">'+esc(pick(f))+"</li>"}).join("")+"</ul></details>";
+ GIFTS.forEach(function(g,k){var id="g-"+k;h+='<details id="'+id+'"'+(open[id]?" open":"")+'><summary><span class="ico">'+g.i+'</span><span class="t"><strong>'+esc(g.t[lang])+"</strong></span></summary><ul>"+g.items.map(function(it,j){var key=k+"-"+j;return '<li class="gift"><label><input type="checkbox" data-k="'+key+'" data-lo="'+it.p[0]+'" data-hi="'+it.p[1]+'"'+(CHK[key]?" checked":"")+'><span>'+esc(pick(it.n))+(it.m?"<small>"+esc(pick(it.m))+"</small>":"")+"</span><em>NT$"+it.p[0]+(it.p[1]>it.p[0]?"–"+it.p[1]:"")+"</em></label></li>"}).join("")+"</ul></details>"});
+ h+='<div class="city" style="color:#888">'+UI.tipsTitle[lang]+"</div>";
+ TIPS.forEach(function(g,k){var id="t-"+k;h+='<details id="'+id+'"'+(open[id]?" open":"")+'><summary><span class="ico">'+g.i+'</span><span class="t"><strong>'+esc(g.t[lang])+"</strong></span></summary><ul>"+g.items.map(function(f){return '<li class="tip">'+esc(pick(f))+"</li>"}).join("")+"</ul></details>"});
+ document.getElementById("list").innerHTML=h;
+ updateTally();
+}
+document.getElementById("langs").addEventListener("click",function(e){var l=e.target.getAttribute("data-l");if(l){lang=l;try{localStorage.setItem("lang",l)}catch(x){}render()}});
+document.getElementById("list").addEventListener("change",function(e){var k=e.target.getAttribute("data-k");if(k){CHK[k]=e.target.checked;updateTally()}});
+render();
+</script>
+</body>
+</html>
